@@ -1,4 +1,4 @@
-package com.aihuishou.c2b.service.common.config.web;
+package com.aihuishou.c2b.service.common.config.web.servlet;
 
 import org.apache.catalina.connector.Connector;
 import org.slf4j.Logger;
