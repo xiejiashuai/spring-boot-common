@@ -2,7 +2,9 @@ package com.aihuishou.c2b.service.common.config.validation;
 
 import org.hibernate.validator.HibernateValidator;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.validation.ValidationAutoConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,6 +28,8 @@ import javax.validation.ValidatorFactory;
 public class CustomizedValidationConfiguration {
 
     @Bean
+    @ConditionalOnClass(name = "org.hibernate.validator.HibernateValidator")
+    @ConditionalOnProperty(value = "spring.bean.validation.fail-fast")
     public Validator validator() {
         ValidatorFactory validatorFactory = Validation.byProvider(HibernateValidator.class)
                 .configure()
@@ -40,6 +44,8 @@ public class CustomizedValidationConfiguration {
 
 
     @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(value = "spring.bean.validation.post-processor", matchIfMissing = true)
     public static BeanValidationPostProcessor beanValidationPostProcessor() {
         return new BeanValidationPostProcessor();
     }

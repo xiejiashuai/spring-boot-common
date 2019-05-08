@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.web.embedded.tomcat.TomcatConnectorCustomizer;
 import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
 import org.springframework.boot.web.server.WebServerFactoryCustomizer;
@@ -30,8 +31,8 @@ import java.util.concurrent.TimeUnit;
  *
  * @author jiashuai.xie
  */
-@ConditionalOnClass(Connector.class)
 @Configuration
+@ConditionalOnClass(Connector.class)
 @AutoConfigureBefore(name = {
         "org.springframework.boot.autoconfigure.web.WebMvcAutoConfiguration",
         "org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration"
@@ -40,6 +41,7 @@ import java.util.concurrent.TimeUnit;
         "org.springframework.boot.autoconfigure.web.DispatcherServletAutoConfiguration",
         "org.springframework.boot.autoconfigure.web.servlet.DispatcherServletAutoConfiguration"
 })
+@ConditionalOnWebApplication(type = ConditionalOnWebApplication.Type.SERVLET)
 public class SpeedUpWebConfiguration {
 
     @Bean

@@ -1,27 +1,28 @@
 package com.aihuishou.c2b.service.common.config.web.servlet.support;
 
-import com.aihuishou.c2b.service.common.config.web.servlet.HttpMethodNotSupportedException;
-import com.alibaba.fastjson.JSON;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.MethodParameter;
+import org.springframework.http.HttpMethod;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
+import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.method.annotation.SpringQueryMap;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
-import org.springframework.web.util.ContentCachingRequestWrapper;
 
 import javax.validation.ConstraintViolation;
 import javax.validation.ValidationException;
 import javax.validation.Validator;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.*;
 
 import static com.aihuishou.c2b.service.common.config.web.servlet.util.MethodArgumentResolverUtils.detectAvailableMethodParameter;
 import static java.util.stream.Collectors.toList;
-import static org.springframework.http.HttpMethod.GET;
 
 /**
  * Resolves method arguments annotated with an @{@link SpringQueryMap}.
@@ -35,8 +36,11 @@ public class SpringQueryMapMethodArgumentResolver implements HandlerMethodArgume
 
     private final Validator validator;
 
-    public SpringQueryMapMethodArgumentResolver(Validator validator) {
+    private final ObjectMapper objectMapper;
+
+    public SpringQueryMapMethodArgumentResolver(Validator validator, ObjectMapper objectMapper) {
         this.validator = validator;
+        this.objectMapper = objectMapper;
     }
 
     @Override
@@ -49,14 +53,6 @@ public class SpringQueryMapMethodArgumentResolver implements HandlerMethodArgume
 
     @Override
     public Object resolveArgument(MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) {
-
-//        ContentCachingRequestWrapper servletWebRequest = (ContentCachingRequestWrapper) webRequest.getNativeRequest();
-//
-//        String method = servletWebRequest.getMethod();
-//
-//        if (!GET.name().equalsIgnoreCase(method)) {
-//            throw new HttpMethodNotSupportedException("http method can not support,except" + GET.toString() + ",but" + method);
-//        }
 
         Class<?> parameterType = parameter.getParameterType();
 
@@ -71,22 +67,27 @@ public class SpringQueryMapMethodArgumentResolver implements HandlerMethodArgume
                 String[] paramValues = webRequest.getParameterValues(name);
                 map.put(name, paramValues[0]);
             } catch (Exception e) {
-                LOGGER.warn(e.getMessage());
+                // ignore
             }
         });
 
-        Object object = JSON.parseObject(JSON.toJSONString(map), parameterType);
 
-        Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object);
+        try {
 
-        // validator failed
-        if (!CollectionUtils.isEmpty(constraintViolations)) {
-            StringBuilder sb = new StringBuilder();
-            constraintViolations.forEach(constraintViolation -> sb.append(constraintViolation.getMessage()).append("\n"));
-            throw new ValidationException(sb.toString());
+            Object object = objectMapper.readValue(objectMapper.writeValueAsString(map), parameterType);
+
+            Set<ConstraintViolation<Object>> constraintViolations = validator.validate(object);
+
+            // validator failed
+            if (!CollectionUtils.isEmpty(constraintViolations)) {
+                StringBuilder sb = new StringBuilder();
+                constraintViolations.forEach(constraintViolation -> sb.append(constraintViolation.getMessage()).append("\n"));
+                throw new ValidationException(sb.toString());
+            }
+
+            return object;
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage());
         }
-
-        return object;
-
     }
 }

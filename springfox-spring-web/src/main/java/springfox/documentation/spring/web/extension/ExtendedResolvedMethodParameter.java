@@ -3,13 +3,16 @@ package springfox.documentation.spring.web.extension;
 import com.fasterxml.classmate.ResolvedType;
 import org.springframework.core.MethodParameter;
 import org.springframework.util.CollectionUtils;
+import org.springframework.validation.annotation.Validated;
 import springfox.documentation.service.ResolvedMethodParameter;
 
+import javax.validation.Valid;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Extend {@link ResolvedMethodParameter}
@@ -31,14 +34,22 @@ public class ExtendedResolvedMethodParameter extends ResolvedMethodParameter {
     }
 
     /**
-     *  get Annotation from interface methodParameter
+     * get Annotation from interface methodParameter
      *
      * @param methodParameter
      * @return
      */
     public static List<Annotation> interfaceAnnotations(MethodParameter methodParameter) {
+
         List<Annotation> annotationList = new ArrayList<>();
-        annotationList.addAll(Arrays.asList(methodParameter.getParameterAnnotations()));
+        // exclude @Valid @Validated on class method(only contain @Valid or @Validated annotation on that method)
+        //  @see OperationParameterReader#shouldExpand(...)
+        List<Annotation> annotations = Arrays.stream(methodParameter.getParameterAnnotations())
+                .filter(annotation -> !Valid.class.isInstance(annotation))
+                .filter(annotation -> !Validated.class.isInstance(annotation))
+                .collect(Collectors.toList());
+
+        annotationList.addAll(annotations);
 
         if (CollectionUtils.isEmpty(annotationList)) {
             for (Class<?> itf : methodParameter.getDeclaringClass().getInterfaces()) {

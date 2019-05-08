@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>io.springfox</groupId>
     <artifactId>springfox-spring-web</artifactId>
-    <version>2.9.2-ext</version>
+    <version>2.9.3.RELEASE</version>
     <packaging>jar</packaging>
 
     <properties>

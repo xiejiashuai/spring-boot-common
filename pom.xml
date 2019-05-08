@@ -6,7 +6,7 @@
 
     <groupId>com.aihuishou.c2b.service.framework</groupId>
     <artifactId>customize-boot2</artifactId>
-    <version>1.0.0.RELEASE</version>
+    <version>1.0.5-SNAPSHOT</version>
 
 
     <dependencies>
@@ -23,8 +23,6 @@
             <groupId>org.hibernate.validator</groupId>
             <artifactId>hibernate-validator</artifactId>
             <version>6.0.13.Final</version>
-            <scope>compile</scope>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -63,7 +61,6 @@
             <groupId>io.github.openfeign</groupId>
             <artifactId>feign-core</artifactId>
             <version>10.1.0</version>
-            <optional>true</optional>
         </dependency>
 
         <!--使用ok http-->
@@ -114,7 +111,7 @@
         <dependency>
             <groupId>io.springfox</groupId>
             <artifactId>springfox-spring-web</artifactId>
-            <version>2.9.2-ext</version>
+            <version>2.9.3.RELEASE</version>
         </dependency>
 
     </dependencies>

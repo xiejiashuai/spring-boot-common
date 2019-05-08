@@ -12,6 +12,7 @@ import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.AutoConfigureBefore;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.cloud.alibaba.sentinel.custom.SentinelAutoConfiguration;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -34,6 +35,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication.Type.SERVLET;
+
 /**
  * @author jiashuai.xie
  */
@@ -41,6 +44,7 @@ import java.util.stream.Collectors;
 @AutoConfigureAfter(WebMvcConfigurationSupport.class)
 @AutoConfigureBefore(SentinelAutoConfiguration.class)
 @ConditionalOnClass(SentinelAutoConfiguration.class)
+@ConditionalOnWebApplication(type = SERVLET)
 public class SentinelConfiguration implements ApplicationRunner, ApplicationContextAware, EnvironmentAware {
 
     private ApplicationContext applicationContext;
