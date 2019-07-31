@@ -26,9 +26,9 @@ spring:
       accept-case-insensitive-properties: true
   data:
     mongodb:
-      uri: ${apim.spring.data.mongodb.uri}
-      database: ${apim.spring.data.mongodb.database}
-      username: ${apim.spring.data.mongodb.username}
+      uri: ${spring.data.mongodb.uri}
+      database: ${spring.data.mongodb.database}
+      username: ${spring.data.mongodb.username}
       option:
         minConnectionsPerHost: 50
         maxConnectionsPerHost: 250
@@ -46,13 +46,13 @@ spring:
         # channel通道
         http_log_saved:
           # topic
-          destination: ${apim.spring.cloud.stream.http_log_saved.destination}
+          destination: ${spring.cloud.stream.http_log_saved.destination}
           # 消费者组
           group: CID_http_log_saved
           # 指定使用哪个binder
           binder: log-service-kafka
         output:
-          destination: ${apim.spring.cloud.stream.http_log_saved.destination}
+          destination: ${spring.cloud.stream.http_log_saved.destination}
           binder: log-service-kafka
       kafka:
         bindings:
@@ -72,7 +72,7 @@ spring:
                 stream:
                   kafka:
                     binder:
-                      brokers: ${apim.spring.cloud.stream.binders.log-service-kafka.environment.spring.cloud.stream.kafka.binder.brokers}
+                      brokers: ${spring.cloud.stream.binders.log-service-kafka.environment.spring.cloud.stream.kafka.binder.brokers}
                       # 关闭自动创建topic
                       #                      auto-create-topics: false
                       # leader副本 ack 0代表不需要broker ack -1代表需要所有副本ack
@@ -81,11 +81,11 @@ spring:
       default-binder: log-service-kafka
   redis:
     url:
-    host: ${apim.redis.host}
-    database: ${apim.redis.database}
-    password: ${apim.redis.password}
-    port: ${apim.redis.port}
-    timeout: ${apim.redis.timeout}
+    host: ${redis.host}
+    database: ${redis.database}
+    password: ${redis.password}
+    port: ${redis.port}
+    timeout: ${redis.timeout}
     lettuce:
       pool:
         min-idle: 16
