@@ -1,0 +1,125 @@
+# 暴露所有web 管控端点
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+
+spring:
+  jackson:
+    default-property-inclusion: non_null
+    deserialization:
+      # 反序列化时出现未知字段 不报错
+      fail-on-unknown-properties: false
+      # 接收单个字符串为list
+      accept_single_value_as_array: true
+    parser:
+      #允许出现特殊字符和转义符
+      allow-unquoted-control-chars: true
+      #允许出现单引号
+      allow-single-quotes: true
+    mapper:
+      # 反序列化时大小写不敏感
+      accept-case-insensitive-properties: true
+  data:
+    mongodb:
+      uri: ${apim.spring.data.mongodb.uri}
+      database: ${apim.spring.data.mongodb.database}
+      username: ${apim.spring.data.mongodb.username}
+      option:
+        minConnectionsPerHost: 50
+        maxConnectionsPerHost: 250
+  mvc:
+    servlet:
+      load-on-startup: 1
+  cloud:
+    sentinel:
+      # 关闭sentinel过滤器
+      filter:
+        enabled: false
+    # kafka stream 相关配置类
+    stream:
+      bindings:
+        # channel通道
+        http_log_saved:
+          # topic
+          destination: ${apim.spring.cloud.stream.http_log_saved.destination}
+          # 消费者组
+          group: CID_http_log_saved
+          # 指定使用哪个binder
+          binder: log-service-kafka
+        output:
+          destination: ${apim.spring.cloud.stream.http_log_saved.destination}
+          binder: log-service-kafka
+      kafka:
+        bindings:
+          http_log_saved:
+            consumer:
+              # 关闭自动提交offset
+              autoCommitOffset: false
+              # 从最近的offset处开始消费
+              startOffset: latest
+      binders:
+        # binder名称
+        log-service-kafka:
+          type: kafka
+          environment:
+            spring:
+              cloud:
+                stream:
+                  kafka:
+                    binder:
+                      brokers: ${apim.spring.cloud.stream.binders.log-service-kafka.environment.spring.cloud.stream.kafka.binder.brokers}
+                      # 关闭自动创建topic
+                      #                      auto-create-topics: false
+                      # leader副本 ack 0代表不需要broker ack -1代表需要所有副本ack
+                      required-acks: 1
+      # 默认binder
+      default-binder: log-service-kafka
+  redis:
+    url:
+    host: ${apim.redis.host}
+    database: ${apim.redis.database}
+    password: ${apim.redis.password}
+    port: ${apim.redis.port}
+    timeout: ${apim.redis.timeout}
+    lettuce:
+      pool:
+        min-idle: 16
+        max-idle: 32
+        max-active: 100
+
+server:
+  servlet:
+    context-path: /apim-log-service
+    jsp:
+      registered: false
+  port: 8080
+  tomcat:
+    accesslog:
+      enabled: false
+    max-threads: 500
+    min-spare-threads: 500
+
+swagger:
+  basePackage: com.envision.apim.controller
+  title: Kong Api Log 转存服务
+  version: 1.0.0.RELEASE
+  description: Kong Api Log 转存服务
+
+
+# feign 相关日志
+feign:
+  okhttp:
+    enabled: true
+  httpclient:
+    enabled: false
+  sentinel:
+    enabled: true
+  client:
+    config:
+      default:
+        logger-level: full
