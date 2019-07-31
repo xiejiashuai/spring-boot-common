@@ -6,10 +6,10 @@
 
   ```xml
    		 <dependency>
-                  <groupId>com.aihuishou.c2b.service.framework</groupId>
-                  <artifactId>customize-boot2</artifactId>
-                  <version>1.0.0-SNAPSHOT</version>
-              </dependency>
+          <groupId>com.aihuishou.c2b.service.framework</groupId>
+          <artifactId>customize-boot2</artifactId>
+          <version>1.0.0-SNAPSHOT</version>
+        </dependency>
   ```
 
 - 激活注解
